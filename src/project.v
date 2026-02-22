@@ -16,8 +16,8 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  assign uio_oe = 8'b0000_0001;  
-  wire _unused = &{ena, uio_out[7:1], uio_in[7:3], uio_in[0], 1'b0};
+  assign uio_oe[2:0] = 3'b001;  
+  wire _unused = &{ena, uio_oe[7:3], uio_out[7:1], uio_in[7:3], uio_in[0], 1'b0};
 
   RangeFinder rf (
     .data_in (ui_in),
