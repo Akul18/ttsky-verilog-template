@@ -22,6 +22,7 @@ logic almostDone, almostDoneReg;
 
 // Next State and Output Generation
 always_comb begin
+   almostDone <= 0;
    case (cs)
       WAIT: begin
          if (finish) begin
