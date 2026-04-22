@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        "RangeFinder"      # Project title
+  title:        "FinalProject"      # Project title
   author:       "Akul Singh"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "Computes the range from input values"      # One line description of what your project does
@@ -18,7 +18,17 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
     - "project.v"
-    - "RangeFinder.sv"
+    - "bird_physics.sv"
+    - "button_debouncing.sv"
+    - "collision_logic.sv" 
+    - "flappy_top.sv" 
+    - "game_fsm.sv"
+    - "graphics.sv" 
+    - "lfsr_pipe_gap.sv"
+    - "pipe_position.sv"
+    - "scoring.sv"
+    - "tick_generator.sv"
+    - "vga.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
