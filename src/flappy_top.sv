@@ -33,10 +33,6 @@ module flappy_top (
     logic game_active, clear_game;
     logic [1:0] state;
 
-    // dummy wires to avoid empty-pin warnings
-    logic hit_pipe0_unused, hit_floor0_unused, hit_ceil0_unused;
-    logic hit_pipe1_unused, hit_floor1_unused, hit_ceil1_unused;
-
     vga vga_inst (
         .row(row),
         .col(col),
@@ -123,9 +119,6 @@ module flappy_top (
         .bird_y(bird_y),
         .pipe_x(pipe0_x),
         .gap_y(gap0_y),
-        .hit_pipe(hit_pipe0_unused),
-        .hit_floor(hit_floor0_unused),
-        .hit_ceiling(hit_ceil0_unused),
         .collision(hit0)
     );
 
@@ -133,9 +126,6 @@ module flappy_top (
         .bird_y(bird_y),
         .pipe_x(pipe1_x),
         .gap_y(gap1_y),
-        .hit_pipe(hit_pipe1_unused),
-        .hit_floor(hit_floor1_unused),
-        .hit_ceiling(hit_ceil1_unused),
         .collision(hit1)
     );
 
@@ -188,12 +178,6 @@ module flappy_top (
         bird_vy,
         score,
         state,
-        hit_pipe0_unused,
-        hit_floor0_unused,
-        hit_ceil0_unused,
-        hit_pipe1_unused,
-        hit_floor1_unused,
-        hit_ceil1_unused,
         1'b0
     };
 
