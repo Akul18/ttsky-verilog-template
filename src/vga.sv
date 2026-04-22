@@ -68,25 +68,3 @@ module simple_counter
             Q <= (Q + 1'b1);
 
 endmodule: simple_counter
-
-module vga_test();
-  logic [9:0] row, col;
-  logic HS, VS, blank;
-  logic CLOCK_50, reset;
-
-  vga DUT (.*);
-
-  initial begin
-    reset = 1;
-    CLOCK_50 = 0;
-    forever #5 CLOCK_50 = ~CLOCK_50;
-  end
-
-  initial begin
-    @(posedge CLOCK_50);
-    @(posedge CLOCK_50);
-    reset <= 0;
-    #10000000 $finish();
-  end
-
-endmodule
