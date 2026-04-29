@@ -33,9 +33,6 @@ module flappy_top (
     logic        hit0, hit1, hit2;
     logic        collision;
 
-    logic        passed0, passed1, passed2;
-    logic [7:0]  score;
-
     logic        game_active, clear_game;
     logic [1:0]  state;
 
@@ -125,26 +122,6 @@ module flappy_top (
 
     assign collision = hit0 | hit1 | hit2;
 
-
-    score_unit s0 (
-        .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
-        .pipe_x(pipe0_x[9:0]), .pipe_wrapped(wrap0), .passed_pulse(passed0)
-    );
-    score_unit s1 (
-        .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
-        .pipe_x(pipe1_x[9:0]), .pipe_wrapped(wrap1), .passed_pulse(passed1)
-    );
-    score_unit s2 (
-        .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
-        .pipe_x(pipe2_x[9:0]), .pipe_wrapped(wrap2), .passed_pulse(passed2)
-    );
-
-    score_counter score_ctr (
-        .clk(CLOCK_50), .reset(reset),
-        .clear_score(clear_game),
-        .inc_score(passed0 | passed1 | passed2),
-        .score(score)
-    );
 
 
     renderer draw (

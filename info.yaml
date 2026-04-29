@@ -26,7 +26,6 @@ project:
     - "graphics.sv" 
     - "lfsr_pipe_gap.sv"
     - "pipe_position.sv"
-    - "scoring.sv"
     - "tick_generator.sv"
     - "vga.sv"
 
