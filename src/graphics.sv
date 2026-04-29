@@ -1,3 +1,4 @@
+// Renderer
 module renderer #(
     parameter int SCREEN_W   = 640,
     parameter int SCREEN_H   = 480,
