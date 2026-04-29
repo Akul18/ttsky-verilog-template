@@ -13,7 +13,7 @@ This project implements a simple Flappy Bird-style game in digital logic. The de
 
 ## How to test
 
-Explain how to use your project
+Connect the VGA output pins to a TinyVGA-style PMOD or equivalent VGA resistor-DAC circuit, then connect the VGA cable to a monitor. Use ui[0] as the START button and ui[1] as the JUMP button. After reset, press START to begin the game, then press JUMP to move the bird upward and avoid the pipe.
 
 ## External hardware
 
