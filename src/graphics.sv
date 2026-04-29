@@ -28,7 +28,7 @@ module renderer #(
 
     logic signed [10:0] brow, bcol;
 
-    logic body_on, eye_on, pupil_on, beak_on, wing_on;
+    logic body_on, eye_on, pupil_on, beak_on;
     logic bird_on;
 
     function automatic logic pipe_pixel_on(
@@ -43,45 +43,35 @@ module renderer #(
             ((row_in < gap_y) || (row_in >= gap_y + GAP_HEIGHT));
     endfunction
 
-    logic signed [10:0] wing_offset;
-
     always_comb begin
-        if (bird_vy < -2)
-            wing_offset = -3;
-        else if (bird_vy > 3)
-            wing_offset = 3;
-        else
-            wing_offset = 0;
-
         brow = $signed({1'b0, row}) - bird_y;
         bcol = $signed({1'b0, col}) - $signed(11'(BIRD_X));
 
         if (brow >= 0 && brow < BIRD_H && bcol >= 0 && bcol < BIRD_W) begin
 
+            // Body: circle centred at (12,12) radius 10
             body_on = ( (bcol-11'sd12)*(bcol-11'sd12) +
                         (brow-11'sd12)*(brow-11'sd12) ) <= 11'sd100;
 
+            // Eye white: circle centred at (17,8) radius 3
             eye_on  = ( (bcol-11'sd17)*(bcol-11'sd17) +
                         (brow-11'sd8) *(brow-11'sd8)  ) <= 11'sd9;
 
+            // Pupil: circle centred at (18,8) radius 1
             pupil_on = ( (bcol-11'sd18)*(bcol-11'sd18) +
                          (brow-11'sd8) *(brow-11'sd8)  ) <= 11'sd1;
 
+            // Beak: small rectangle on the right side
             beak_on = (bcol >= 11'sd20) && (bcol <= 11'sd23) &&
                       (brow >= 11'sd10) && (brow <= 11'sd13);
 
-            wing_on = ( 4*(bcol-11'sd8)*(bcol-11'sd8) +
-                        9*(brow-11'sd16-wing_offset)*(brow-11'sd16-wing_offset)
-                      ) <= 11'sd36;
-
-            bird_on = body_on || eye_on || wing_on || beak_on;
+            bird_on = body_on || eye_on || beak_on;
 
         end else begin
             body_on  = 1'b0;
             eye_on   = 1'b0;
             pupil_on = 1'b0;
             beak_on  = 1'b0;
-            wing_on  = 1'b0;
             bird_on  = 1'b0;
         end
 
@@ -105,7 +95,7 @@ module renderer #(
         end else if (eye_on) begin
             r = 3'b111; g = 3'b111; b = 3'b111;
 
-        end else if (body_on || wing_on) begin
+        end else if (body_on) begin
             r = 3'b111; g = 3'b110; b = 3'b000;
 
         end else if (pipe0_on || pipe1_on) begin
