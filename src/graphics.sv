@@ -16,15 +16,15 @@ module renderer #(
     input  logic signed [10:0] bird_y,
     input  logic signed [10:0] bird_vy,
 
-    input  logic [9:0]  pipe0_x, pipe1_x,
-    input  logic [9:0]  gap0_y,  gap1_y,
+    input  logic [9:0]  pipe0_x,
+    input  logic [9:0]  gap0_y,
 
     output logic [2:0] r,
     output logic [2:0] g,
     output logic [2:0] b
 );
     logic ground_on;
-    logic pipe0_on, pipe1_on;
+    logic pipe0_on;
 
     logic signed [10:0] brow, bcol;
 
@@ -49,19 +49,15 @@ module renderer #(
 
         if (brow >= 0 && brow < BIRD_H && bcol >= 0 && bcol < BIRD_W) begin
 
-            // Body: circle centred at (12,12) radius 10
             body_on = ( (bcol-11'sd12)*(bcol-11'sd12) +
                         (brow-11'sd12)*(brow-11'sd12) ) <= 11'sd100;
 
-            // Eye white: circle centred at (17,8) radius 3
             eye_on  = ( (bcol-11'sd17)*(bcol-11'sd17) +
                         (brow-11'sd8) *(brow-11'sd8)  ) <= 11'sd9;
 
-            // Pupil: circle centred at (18,8) radius 1
             pupil_on = ( (bcol-11'sd18)*(bcol-11'sd18) +
                          (brow-11'sd8) *(brow-11'sd8)  ) <= 11'sd1;
 
-            // Beak: small rectangle on the right side
             beak_on = (bcol >= 11'sd20) && (bcol <= 11'sd23) &&
                       (brow >= 11'sd10) && (brow <= 11'sd13);
 
@@ -78,7 +74,6 @@ module renderer #(
         ground_on = (row >= GROUND_Y);
 
         pipe0_on = game_active && pipe_pixel_on(11'(col), row, {1'b0, pipe0_x}, gap0_y);
-        pipe1_on = game_active && pipe_pixel_on(11'(col), row, {1'b0, pipe1_x}, gap1_y);
 
         if (blank) begin
             r = 3'b000; g = 3'b000; b = 3'b000;
@@ -98,7 +93,7 @@ module renderer #(
         end else if (body_on) begin
             r = 3'b111; g = 3'b110; b = 3'b000;
 
-        end else if (pipe0_on || pipe1_on) begin
+        end else if (pipe0_on) begin
             r = 3'b000; g = 3'b111; b = 3'b000;
 
         end else begin

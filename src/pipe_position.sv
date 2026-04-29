@@ -1,5 +1,5 @@
 module pipe_unit #(
-    parameter int PIPE_SPEED = 4,
+    parameter int PIPE_SPEED = 10,
     parameter int PIPE_WIDTH = 60,
     parameter int GAP_MIN    = 80,
     parameter int GAP_RANGE  = 220

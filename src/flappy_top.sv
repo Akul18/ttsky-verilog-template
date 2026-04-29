@@ -14,22 +14,21 @@ module flappy_top (
 
     localparam int PIPE_SPACING = 360;
     localparam int INIT0        = 640;
-    localparam int INIT1        = INIT0 + PIPE_SPACING;
 
     logic [9:0]  row, col;
     logic        tick;
 
     logic        start_pulse, jump_pulse;
 
-    logic [15:0] rnd0, rnd1;
+    logic [15:0] rnd0;
 
     logic signed [10:0] bird_y, bird_vy;
 
-    logic [10:0] pipe0_x, pipe1_x;
-    logic [9:0]  gap0_y,  gap1_y;
-    logic        wrap0, wrap1;
+    logic [10:0] pipe0_x;
+    logic [9:0]  gap0_y;
+    logic        wrap0;
 
-    logic        hit0, hit1;
+    logic        hit0;
     logic        collision;
 
     logic        game_active, clear_game;
@@ -55,9 +54,6 @@ module flappy_top (
     lfsr16 #(.SEED(16'hACE1)) rand0 (
         .clk(CLOCK_50), .reset(reset), .en(tick), .rnd(rnd0)
     );
-    lfsr16 #(.SEED(16'h1234)) rand1 (
-        .clk(CLOCK_50), .reset(reset), .en(tick), .rnd(rnd1)
-    );
 
     game_fsm fsm (
         .clk(CLOCK_50), .reset(reset), .tick(tick),
@@ -79,36 +75,24 @@ module flappy_top (
         .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
         .rnd(rnd0),
         .init_x(11'(INIT0)),
-        .spawn_x(pipe1_x + 11'(PIPE_SPACING)),
+        .spawn_x(11'(INIT0)),        // single pipe: always respawns at same start X
         .pipe_x(pipe0_x), .gap_y(gap0_y), .wrapped(wrap0)
-    );
-
-    pipe_unit pipe1 (
-        .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
-        .rnd(rnd1),
-        .init_x(11'(INIT1)),
-        .spawn_x(pipe0_x + 11'(PIPE_SPACING)),
-        .pipe_x(pipe1_x), .gap_y(gap1_y), .wrapped(wrap1)
     );
 
     collision_unit col0 (
         .bird_y(bird_y), .pipe_x(pipe0_x), .gap_y(gap0_y),
         .hit_pipe(), .hit_floor(), .hit_ceiling(), .collision(hit0)
     );
-    collision_unit col1 (
-        .bird_y(bird_y), .pipe_x(pipe1_x), .gap_y(gap1_y),
-        .hit_pipe(), .hit_floor(), .hit_ceiling(), .collision(hit1)
-    );
 
-    assign collision = hit0 | hit1;
+    assign collision = hit0;
 
     renderer draw (
         .row(row), .col(col), .blank(blank),
         .game_active(game_active),
         .bird_y(bird_y),
         .bird_vy(bird_vy),
-        .pipe0_x(pipe0_x[9:0]), .pipe1_x(pipe1_x[9:0]),
-        .gap0_y(gap0_y),        .gap1_y(gap1_y),
+        .pipe0_x(pipe0_x[9:0]),
+        .gap0_y(gap0_y),
         .r(r), .g(g), .b(b)
     );
 
