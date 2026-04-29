@@ -12,36 +12,33 @@ module flappy_top (
     output logic [2:0] b
 );
 
-    localparam int PIPE_SPACING = 185;   
+    localparam int PIPE_SPACING = 360;
     localparam int INIT0        = 640;
-    localparam int INIT1        = INIT0 + PIPE_SPACING;  
-    localparam int INIT2        = INIT1 + PIPE_SPACING;   
+    localparam int INIT1        = INIT0 + PIPE_SPACING;
 
     logic [9:0]  row, col;
     logic        tick;
 
     logic        start_pulse, jump_pulse;
 
-    logic [15:0] rnd0, rnd1, rnd2;
+    logic [15:0] rnd0, rnd1;
 
     logic signed [10:0] bird_y, bird_vy;
 
-    logic [10:0] pipe0_x, pipe1_x, pipe2_x;  
-    logic [9:0]  gap0_y,  gap1_y,  gap2_y;
-    logic        wrap0, wrap1, wrap2;
+    logic [10:0] pipe0_x, pipe1_x;
+    logic [9:0]  gap0_y,  gap1_y;
+    logic        wrap0, wrap1;
 
-    logic        hit0, hit1, hit2;
+    logic        hit0, hit1;
     logic        collision;
 
     logic        game_active, clear_game;
     logic [1:0]  state;
 
-
     vga vga_inst (
         .row(row), .col(col), .HS(HS), .VS(VS), .blank(blank),
         .CLOCK_50(CLOCK_50), .reset(reset)
     );
-
 
     button_sync_onepulse start_btn (
         .clk(CLOCK_50), .reset(reset), .btn_in(btn_start), .btn_pulse(start_pulse)
@@ -61,9 +58,6 @@ module flappy_top (
     lfsr16 #(.SEED(16'h1234)) rand1 (
         .clk(CLOCK_50), .reset(reset), .en(tick), .rnd(rnd1)
     );
-    lfsr16 #(.SEED(16'hBEEF)) rand2 (
-        .clk(CLOCK_50), .reset(reset), .en(tick), .rnd(rnd2)
-    );
 
     game_fsm fsm (
         .clk(CLOCK_50), .reset(reset), .tick(tick),
@@ -73,7 +67,6 @@ module flappy_top (
         .clear_game(clear_game),
         .state(state)
     );
-
 
     bird_physics bird (
         .clk(CLOCK_50), .reset(reset), .tick(tick),
@@ -86,7 +79,7 @@ module flappy_top (
         .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
         .rnd(rnd0),
         .init_x(11'(INIT0)),
-        .spawn_x(pipe2_x + 11'(PIPE_SPACING)),   // spawns behind pipe2
+        .spawn_x(pipe1_x + 11'(PIPE_SPACING)),
         .pipe_x(pipe0_x), .gap_y(gap0_y), .wrapped(wrap0)
     );
 
@@ -94,18 +87,9 @@ module flappy_top (
         .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
         .rnd(rnd1),
         .init_x(11'(INIT1)),
-        .spawn_x(pipe0_x + 11'(PIPE_SPACING)),   // spawns behind pipe0
+        .spawn_x(pipe0_x + 11'(PIPE_SPACING)),
         .pipe_x(pipe1_x), .gap_y(gap1_y), .wrapped(wrap1)
     );
-
-    pipe_unit pipe2 (
-        .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
-        .rnd(rnd2),
-        .init_x(11'(INIT2)),
-        .spawn_x(pipe1_x + 11'(PIPE_SPACING)),   // spawns behind pipe1
-        .pipe_x(pipe2_x), .gap_y(gap2_y), .wrapped(wrap2)
-    );
-
 
     collision_unit col0 (
         .bird_y(bird_y), .pipe_x(pipe0_x), .gap_y(gap0_y),
@@ -115,22 +99,16 @@ module flappy_top (
         .bird_y(bird_y), .pipe_x(pipe1_x), .gap_y(gap1_y),
         .hit_pipe(), .hit_floor(), .hit_ceiling(), .collision(hit1)
     );
-    collision_unit col2 (
-        .bird_y(bird_y), .pipe_x(pipe2_x), .gap_y(gap2_y),
-        .hit_pipe(), .hit_floor(), .hit_ceiling(), .collision(hit2)
-    );
 
-    assign collision = hit0 | hit1 | hit2;
-
-
+    assign collision = hit0 | hit1;
 
     renderer draw (
         .row(row), .col(col), .blank(blank),
-        .game_active(game_active),      
+        .game_active(game_active),
         .bird_y(bird_y),
         .bird_vy(bird_vy),
-        .pipe0_x(pipe0_x[9:0]), .pipe1_x(pipe1_x[9:0]), .pipe2_x(pipe2_x[9:0]),
-        .gap0_y(gap0_y),        .gap1_y(gap1_y),         .gap2_y(gap2_y),
+        .pipe0_x(pipe0_x[9:0]), .pipe1_x(pipe1_x[9:0]),
+        .gap0_y(gap0_y),        .gap1_y(gap1_y),
         .r(r), .g(g), .b(b)
     );
 

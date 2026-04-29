@@ -14,24 +14,22 @@ module renderer #(
     input  logic       game_active,
 
     input  logic signed [10:0] bird_y,
-    input  logic signed [10:0] bird_vy,   
+    input  logic signed [10:0] bird_vy,
 
-    input  logic [10:0] pipe0_x, pipe1_x, pipe2_x,
-    input  logic [9:0]  gap0_y,  gap1_y,  gap2_y,
+    input  logic [9:0]  pipe0_x, pipe1_x,
+    input  logic [9:0]  gap0_y,  gap1_y,
 
     output logic [2:0] r,
     output logic [2:0] g,
     output logic [2:0] b
 );
     logic ground_on;
-    logic pipe0_on, pipe1_on, pipe2_on;
+    logic pipe0_on, pipe1_on;
 
-    logic signed [10:0] brow, bcol;  
+    logic signed [10:0] brow, bcol;
 
-    // Bird layers
     logic body_on, eye_on, pupil_on, beak_on, wing_on;
     logic bird_on;
-
 
     function automatic logic pipe_pixel_on(
         input logic [10:0] col_in,
@@ -45,24 +43,13 @@ module renderer #(
             ((row_in < gap_y) || (row_in >= gap_y + GAP_HEIGHT));
     endfunction
 
-    // ----------------------------------------------------------------
-    // Bird shape — all coordinates are offsets from (BIRD_X, bird_y)
-    // The bird is 24x24. Centre of body circle is at (12, 12).
-    //
-    //   body:   filled circle r=10 centred at (12,12)
-    //   eye:    filled circle r=3  centred at (17, 8)  (upper right)
-    //   pupil:  filled circle r=1  centred at (18, 8)
-    //   beak:   triangle-ish block cols 21-23, rows 10-13
-    //   wing:   small ellipse that shifts up when vy < 0 (flapping)
-    //           centred at (8, 16+wing_offset)
-    // ----------------------------------------------------------------
     logic signed [10:0] wing_offset;
 
     always_comb begin
         if (bird_vy < -2)
-            wing_offset = -3;          
+            wing_offset = -3;
         else if (bird_vy > 3)
-            wing_offset = 3;          
+            wing_offset = 3;
         else
             wing_offset = 0;
 
@@ -71,26 +58,18 @@ module renderer #(
 
         if (brow >= 0 && brow < BIRD_H && bcol >= 0 && bcol < BIRD_W) begin
 
-            // Body: circle centred at (12,12) radius 10
-            // (bcol-12)^2 + (brow-12)^2 <= 100
             body_on = ( (bcol-11'sd12)*(bcol-11'sd12) +
                         (brow-11'sd12)*(brow-11'sd12) ) <= 11'sd100;
 
-            // Eye white: circle centred at (17,8) radius 3
             eye_on  = ( (bcol-11'sd17)*(bcol-11'sd17) +
                         (brow-11'sd8) *(brow-11'sd8)  ) <= 11'sd9;
 
-            // Pupil: circle centred at (18,8) radius 1
             pupil_on = ( (bcol-11'sd18)*(bcol-11'sd18) +
                          (brow-11'sd8) *(brow-11'sd8)  ) <= 11'sd1;
 
-            // Beak: small rectangle on the right side
             beak_on = (bcol >= 11'sd20) && (bcol <= 11'sd23) &&
                       (brow >= 11'sd10) && (brow <= 11'sd13);
 
-            // Wing: small ellipse, shifts with velocity
-            // Ellipse: (bcol-8)^2/9 + (brow-16-offset)^2/4 <= 1
-            // Multiply through by 36: 4*(bcol-8)^2 + 9*(brow-16-offset)^2 <= 36
             wing_on = ( 4*(bcol-11'sd8)*(bcol-11'sd8) +
                         9*(brow-11'sd16-wing_offset)*(brow-11'sd16-wing_offset)
                       ) <= 11'sd36;
@@ -108,34 +87,32 @@ module renderer #(
 
         ground_on = (row >= GROUND_Y);
 
-        pipe0_on = game_active && pipe_pixel_on(11'(col), row, pipe0_x, gap0_y);
-        pipe1_on = game_active && pipe_pixel_on(11'(col), row, pipe1_x, gap1_y);
-        pipe2_on = game_active && pipe_pixel_on(11'(col), row, pipe2_x, gap2_y);
-
+        pipe0_on = game_active && pipe_pixel_on(11'(col), row, {1'b0, pipe0_x}, gap0_y);
+        pipe1_on = game_active && pipe_pixel_on(11'(col), row, {1'b0, pipe1_x}, gap1_y);
 
         if (blank) begin
             r = 3'b000; g = 3'b000; b = 3'b000;
 
         end else if (ground_on) begin
-            r = 3'b101; g = 3'b100; b = 3'b000;   // brown ground
+            r = 3'b101; g = 3'b100; b = 3'b000;
 
         end else if (beak_on) begin
-            r = 3'b111; g = 3'b101; b = 3'b000;   // orange beak
+            r = 3'b111; g = 3'b101; b = 3'b000;
 
         end else if (pupil_on) begin
-            r = 3'b000; g = 3'b000; b = 3'b000;   // black pupil
+            r = 3'b000; g = 3'b000; b = 3'b000;
 
         end else if (eye_on) begin
-            r = 3'b111; g = 3'b111; b = 3'b111;   // white eye
+            r = 3'b111; g = 3'b111; b = 3'b111;
 
         end else if (body_on || wing_on) begin
-            r = 3'b111; g = 3'b110; b = 3'b000;   // yellow body/wing
+            r = 3'b111; g = 3'b110; b = 3'b000;
 
-        end else if (pipe0_on || pipe1_on || pipe2_on) begin
-            r = 3'b000; g = 3'b111; b = 3'b000;   // green pipe
+        end else if (pipe0_on || pipe1_on) begin
+            r = 3'b000; g = 3'b111; b = 3'b000;
 
         end else begin
-            r = 3'b010; g = 3'b110; b = 3'b111;   // sky
+            r = 3'b010; g = 3'b110; b = 3'b111;
         end
     end
 endmodule
