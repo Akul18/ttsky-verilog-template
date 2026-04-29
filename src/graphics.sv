@@ -14,7 +14,6 @@ module renderer #(
     input  logic       game_active,
 
     input  logic signed [10:0] bird_y,
-    input  logic signed [10:0] bird_vy,
 
     input  logic [9:0]  pipe0_x,
     input  logic [9:0]  gap0_y,
