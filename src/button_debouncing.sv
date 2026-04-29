@@ -22,4 +22,3 @@ module button_sync_onepulse (
 
     assign btn_pulse = sync1 & ~sync1_d;   // rising-edge one pulse
 endmodule
-

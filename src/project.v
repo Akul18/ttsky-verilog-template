@@ -4,32 +4,23 @@
 
 `default_nettype none
 
-module tt_um_example (
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
-    input  wire [7:0] uio_in,   // Bidirectional inputs
-    output wire [7:0] uio_out,  // Bidirectional outputs
-    output wire [7:0] uio_oe,   // Bidirectional output enables
-    input  wire       ena,      // always 1 when powered
-    input  wire       clk,      // clock
-    input  wire       rst_n     // active-low reset
+module tt_um_flappy_vga_Akul18 (
+    input  wire [7:0] ui_in,
+    output wire [7:0] uo_out,
+    input  wire [7:0] uio_in,
+    output wire [7:0] uio_out,
+    output wire [7:0] uio_oe,
+    input  wire       ena,
+    input  wire       clk,
+    input  wire       rst_n
 );
 
-    // -------------------------
-    // Internal signals
-    // -------------------------
     wire HS, VS, blank;
     wire [2:0] r, g, b;
 
-    // -------------------------
-    // Unused inputs
-    // -------------------------
-    wire _unused = &{ena, ui_in[7:2], uio_in[7:0], 1'b0};
+    wire _unused = &{ena, ui_in[7:2], uio_in, blank, r[0], g[0], b[0], 1'b0};
 
-    // -------------------------
-    // flappy_top instantiation
-    // -------------------------
-    flappy_top uut (
+    flappy_top flappy (
         .CLOCK_50  (clk),
         .reset     (~rst_n),
         .btn_start (ui_in[0]),
@@ -42,25 +33,17 @@ module tt_um_example (
         .b         (b)
     );
 
-    // -------------------------
-    // Output pin mapping
-    // 12 total outputs:
-    // HS, VS, blank, r[2:0], g[2:0], b[2:0]
-    // -------------------------
+    // Match TinyVGA PMOD-style 2-bit RGB + sync
+    assign uo_out[0] = r[1];  // VGA R0
+    assign uo_out[1] = r[2];  // VGA R1
+    assign uo_out[2] = g[1];  // VGA G0
+    assign uo_out[3] = g[2];  // VGA G1
+    assign uo_out[4] = b[1];  // VGA B0
+    assign uo_out[5] = b[2];  // VGA B1
+    assign uo_out[6] = HS;
+    assign uo_out[7] = VS;
 
-    // Dedicated outputs
-    assign uo_out[0] = HS;
-    assign uo_out[1] = VS;
-    assign uo_out[2] = blank;
-    assign uo_out[5:3] = r;
-    assign uo_out[7:6] = g[2:1];
-
-    // Bidirectional outputs used as outputs
-    assign uio_out[0] = g[0];
-    assign uio_out[3:1] = b;
-    assign uio_out[7:4] = 4'b0000;
-
-    // Enable only the used uio outputs
-    assign uio_oe = 8'b0000_1111;
+    assign uio_out = 8'b0;
+    assign uio_oe  = 8'b0;
 
 endmodule

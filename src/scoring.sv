@@ -2,13 +2,13 @@ module score_unit #(
     parameter int BIRD_X     = 120,
     parameter int PIPE_WIDTH = 60
 ) (
-    input  logic       clk,
-    input  logic       reset,
-    input  logic       tick,
-    input  logic       game_active,
-    input  logic [9:0] pipe_x,
-    input  logic       pipe_wrapped,
-    output logic       passed_pulse
+    input  logic        clk,
+    input  logic        reset,
+    input  logic        tick,
+    input  logic        game_active,
+    input  logic [10:0] pipe_x,       // widened to 11-bit to match pipe_unit
+    input  logic        pipe_wrapped,
+    output logic        passed_pulse
 );
     logic scored_this_pipe;
 
@@ -25,7 +25,9 @@ module score_unit #(
             if (pipe_wrapped)
                 scored_this_pipe <= 1'b0;
 
-            if (!scored_this_pipe && (pipe_x + PIPE_WIDTH < BIRD_X)) begin
+            if (!scored_this_pipe &&
+                (pipe_x < 11'(640)) &&
+                (pipe_x + 11'(PIPE_WIDTH) < 11'(BIRD_X))) begin
                 scored_this_pipe <= 1'b1;
                 passed_pulse     <= 1'b1;
             end
@@ -47,7 +49,7 @@ module score_counter (
             score <= 8'd0;
         else if (clear_score)
             score <= 8'd0;
-        else if (inc_score)
-            score <= score + 1'b1;
+        else if (inc_score && score != 8'hFF)  
+            score <= score + 8'd1;
     end
 endmodule
