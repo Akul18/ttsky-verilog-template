@@ -8,33 +8,57 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
-    dut._log.info("Start")
+    dut._log.info("Start Flappy VGA test")
 
-    # Set the clock period to 10 us (100 KHz)
+    # 100 kHz test clock
     clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
 
-    # Reset
-    dut._log.info("Reset")
+    # Initial values
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
+
+    # Reset
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 10)
 
-    dut._log.info("Test project behavior")
+    # uio pins are unused, so they should be disabled and driven low internally
+    assert int(dut.uio_oe.value) == 0, "uio_oe should be 0 because uio pins are unused"
+    assert int(dut.uio_out.value) == 0, "uio_out should be 0 because uio pins are unused"
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    # VGA outputs should not be X/Z after reset
+    assert dut.uo_out.value.is_resolvable, "uo_out contains X/Z after reset"
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    # Press START: ui_in[0]
+    dut.ui_in.value = 0b00000001
+    await ClockCycles(dut.clk, 5)
+    dut.ui_in.value = 0
+    await ClockCycles(dut.clk, 20)
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    # Press JUMP: ui_in[1]
+    dut.ui_in.value = 0b00000010
+    await ClockCycles(dut.clk, 5)
+    dut.ui_in.value = 0
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    # Check that HSYNC toggles.
+    # uo_out[6] = HSYNC, uo_out[7] = VSYNC
+    seen_hs_toggle = False
+    last_hs = int(dut.uo_out.value[6])
+
+    for _ in range(2000):
+        await ClockCycles(dut.clk, 1)
+
+        assert dut.uo_out.value.is_resolvable, "uo_out became X/Z during VGA operation"
+
+        hs = int(dut.uo_out.value[6])
+        if hs != last_hs:
+            seen_hs_toggle = True
+
+        last_hs = hs
+
+    assert seen_hs_toggle, "HSYNC did not toggle"
+
+    dut._log.info("Flappy VGA smoke test passed")

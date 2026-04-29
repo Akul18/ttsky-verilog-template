@@ -65,7 +65,7 @@ module flappy_top (
         .clk(CLOCK_50), .reset(reset), .tick(tick),
         .game_active(game_active),
         .flap_pulse(jump_pulse && game_active),
-        .bird_y(bird_y), bird_vy()
+        .bird_y(bird_y), .bird_vy()
     );
 
     pipe_unit pipe0 (
