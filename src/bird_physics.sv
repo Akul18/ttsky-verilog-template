@@ -10,7 +10,8 @@ module bird_physics #(
     input  logic        tick,        
     input  logic        game_active,
     input  logic        flap_pulse, 
-    output logic signed [10:0] bird_y
+    output logic signed [10:0] bird_y,
+    output logic signed [10:0] bird_vy
 );
     logic signed [14:0] y_full, vy_full;
     logic               flap_pending;
