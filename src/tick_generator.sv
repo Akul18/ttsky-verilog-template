@@ -1,5 +1,5 @@
 module game_tick #(
-    parameter integer DIV = 833333  // ~60 Hz from 50 MHz
+    parameter integer DIV = 833333 
 ) (
     input  logic clk,
     input  logic reset,

@@ -1,42 +1,11 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+## How it works
+This project implements a simple Flappy Bird-style game in digital logic. VGA timing logic generates horizontal/vertical sync signals and pixel coordinates to drive a display. A physics module updates the bird’s vertical position using gravity and jump inputs, while a pipe generator creates a moving obstacle with a gap.
+Collision logic detects when the bird hits the pipe or ground, ending the game. A renderer uses the current pixel location to draw the bird, pipe, ground, and background in real time. The output is sent as 2-bit RGB signals along with HSYNC and VSYNC to a VGA display.
 
-# Tiny Tapeout Verilog Project Template
+## How to test
+Connect the VGA outputs to a TinyVGA-style PMOD or resistor-based VGA DAC, then connect to a monitor. Ensure the chip is powered and clocked.
+Use ui[0] as START and ui[1] as JUMP. After reset, press START to begin. Press JUMP to move the bird upward and avoid the pipe. If the bird collides, the game ends and can be restarted.
 
-- [Read the documentation for project](docs/info.md)
-
-## What is Tiny Tapeout?
-
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
-
-To learn more and get started, visit https://tinytapeout.com.
-
-## Set up your Verilog project
-
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
-
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
-
-## Enable GitHub actions to build the results page
-
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
-
-## Resources
-
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
-
-## What next?
-
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+## External hardware
+This project requires a VGA interface (TinyVGA PMOD or equivalent resistor-DAC circuit) and a VGA monitor. It outputs 2-bit RGB signals plus HSYNC and VSYNC.
+Push buttons should be connected to ui[0] and ui[1] for game control.

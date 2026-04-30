@@ -33,7 +33,6 @@ module tt_um_flappy_vga_Akul18 (
         .b         (b)
     );
 
-    // Match TinyVGA PMOD-style 2-bit RGB + sync
     assign uo_out[0] = r[1];  // VGA R0
     assign uo_out[1] = r[2];  // VGA R1
     assign uo_out[2] = g[1];  // VGA G0

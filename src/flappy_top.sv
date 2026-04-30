@@ -72,7 +72,7 @@ module flappy_top (
         .clk(CLOCK_50), .reset(reset), .tick(tick), .game_active(game_active),
         .rnd(rnd0),
         .init_x(11'(INIT0)),
-        .spawn_x(11'(INIT0)),        // single pipe: always respawns at same start X
+        .spawn_x(11'(INIT0)),        
         .pipe_x(pipe0_x), .gap_y(gap0_y), .wrapped()
     );
 
