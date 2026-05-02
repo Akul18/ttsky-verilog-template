@@ -33,14 +33,15 @@ module tt_um_flappy_vga_Akul18 (
         .b         (b)
     );
 
-    assign uo_out[0] = r[1];  // VGA R0
-    assign uo_out[1] = r[2];  // VGA R1
-    assign uo_out[2] = g[1];  // VGA G0
-    assign uo_out[3] = g[2];  // VGA G1
-    assign uo_out[4] = b[1];  // VGA B0
-    assign uo_out[5] = b[2];  // VGA B1
-    assign uo_out[6] = HS;
-    assign uo_out[7] = VS;
+    assign uo_out[0] = r[2];  // R1
+    assign uo_out[1] = g[2];  // G1
+    assign uo_out[2] = b[2];  // B1
+    assign uo_out[3] = VS;    // VSYNC
+
+    assign uo_out[4] = r[1];  // R0
+    assign uo_out[5] = g[1];  // G0
+    assign uo_out[6] = b[1];  // B0
+    assign uo_out[7] = HS;    // HSYNC
 
     assign uio_out = 8'b0;
     assign uio_oe  = 8'b0;
